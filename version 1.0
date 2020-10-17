@@ -1,0 +1,202 @@
+#include <iostream>
+#include <conio.h>
+#include <Windows.h>
+using namespace std;
+
+struct mypoint
+{
+	int x, y;
+};
+
+class MyStack {
+public:
+	mypoint arr[1000];
+	int top;
+	
+	MyStack() {
+		top = 0;
+	}
+	void push(mypoint n)
+	{
+		
+		arr[top].x = n.x;
+		arr[top].y = n.y;
+		top++;
+	}
+	mypoint pop()
+	{
+			top--;
+			return arr[top];
+	}
+	mypoint peek()
+	{
+		mypoint p;
+		p = arr[top - 1];
+		return p;
+	}
+};
+class Maze {
+public:
+	int mazeArray[16][30] = {{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},//1
+							 {0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0},//2
+							 {0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0},//3
+							 {0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0},//4
+							 {0,0,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0},//5
+							 {0,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0},//6
+							 {0,1,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0},//7
+							 {0,1,1,1,1,1,1,0,0,1,0,0,0,1,0,0,1,1,1,1,1,1,1,0,0,0,0,1,0,0},//8
+							 {0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0,1,1,1,1,1,1,1,0},//9
+							 {0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0},//10
+							 {0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,0,0,1,1,1,1,1,1,1,1,1,1,0},//11
+							 {0,0,1,0,0,0,0,0,0,0,1,1,1,1,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0},//12
+							 {0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0},//13
+							 {0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0},//14
+							 {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},//15
+							 {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2}//16
+
+	};
+	MyStack Tracks;
+	int xlocation, ylocation;
+
+	Maze()
+	{
+		xlocation = ylocation = 0;
+	}
+
+	void gotoxy(int row, int col)
+	{
+		COORD coord;
+		coord.X = row;
+		coord.Y = col;
+		SetConsoleCursorPosition(
+			GetStdHandle(STD_OUTPUT_HANDLE),
+			coord);
+	}
+
+	void setBrushColor(int color)
+	{
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(hConsole, color);
+	}
+	bool topOfStackIsNot(int x, int y) {
+		mypoint p;
+		p = Tracks.peek();
+		if ((p.x == x) && (p.y == y))
+		{
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+	void startMouse(int x, int y)
+	{
+		xlocation = x;
+		ylocation = y;
+	}
+
+	void showMouse()
+	{
+		gotoxy(xlocation, ylocation);
+		cout << "X";
+	}
+	void hideMouse()
+	{
+		gotoxy(xlocation, ylocation);
+		cout << " ";
+	}
+
+	void moveMouse()
+	{
+		hideMouse();
+
+		mypoint p;
+	
+		if ((mazeArray[ylocation + 1][xlocation] == 1) && (topOfStackIsNot(xlocation, ylocation + 1))) //Moving Down
+		{
+			p.x = xlocation;
+			p.y = ylocation;
+			Tracks.push(p);
+			ylocation++;
+		}
+		else if ((mazeArray[ylocation][xlocation + 1] == 1) && (topOfStackIsNot(xlocation + 1, ylocation))) //Moving Right
+		{
+			p.x = xlocation;
+			p.y = ylocation;
+			Tracks.push(p);
+			xlocation++;
+		}
+		
+		else if ((mazeArray[ylocation][xlocation - 1] == 1) && (topOfStackIsNot(xlocation - 1, ylocation))) //Moving Left
+		{
+			p.x = xlocation;
+			p.y = ylocation;
+			Tracks.push(p);
+			xlocation--;
+		}
+		else if ((mazeArray[ylocation - 1][xlocation] == 1) && (topOfStackIsNot(xlocation, ylocation - 1))) //Moving Up
+		{
+			p.x = xlocation;
+			p.y = ylocation;
+			Tracks.push(p);
+			ylocation--;
+		}
+		else 
+		{
+			p = Tracks.pop();
+			mazeArray[ylocation][xlocation] = 0;
+			xlocation = p.x;
+			ylocation = p.y;
+		}
+		
+
+		showMouse();
+		Sleep(50);
+	}
+	
+	void displayMaze(int x, int y) {
+		for (int i = 0; i <= 15; i++) {
+			for (int j = 0; j <= 30; j++) {
+				gotoxy(j, i);
+				if (mazeArray[i][j] == 0)
+				{
+					cout << char(176);
+				}
+				else if (mazeArray[i][j] == 1)
+				{
+					cout << " ";
+				}
+				else if (mazeArray[i][j] == 3)
+				{
+					cout << char(247);
+				}
+			}//End inner loop
+			cout << endl;
+		}//End double loop
+	}
+};
+
+int main()
+{
+	Maze m;
+	m.displayMaze(10, 10);
+	m.startMouse(1, 0);
+	mypoint p;
+	p.x = 1;
+	p.y = 0;
+	m.Tracks.push(p);
+	while (1)
+	{
+		if (m.ylocation != 15)
+		{
+			m.moveMouse();
+		}
+		else
+		{
+			cout << "Game Over!";
+			break;
+		}
+		
+	}
+	return 0;
+}
